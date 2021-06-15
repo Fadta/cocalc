@@ -1,11 +1,15 @@
 from enum import Enum
 from tokens import TokenType, Token, Values
+from calc_excepts import CocalcException
 
 BLANK = ' \n\t,'
 DIGITS = '0123456789'
 CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 
 class Lexer:
+    """
+    The lexer abstracts the characters into lexical units (Tokens)
+    """
     def __init__(self, text):
         self.text = iter(text)
         self.advance()
@@ -83,6 +87,9 @@ class Lexer:
             elif self.current_char == ')':
                 self.advance()
                 yield Token(TokenType.PAREN, Values.PAREN_CLOSE)
+            elif self.current_char == '=':
+                self.advance()
+                yield Token(TokenType.ASSIGNMENT, None)
 
             ###### ARITHMETIC SYMBOLS #####
             elif self.current_char == '+':
@@ -102,6 +109,6 @@ class Lexer:
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_EXP)
 
             else:
-                raise Exception(f"IllegalCharacter: {self.current_char}")
+                raise CocalcException(f"IllegalCharacter: {self.current_char}")
 
 
