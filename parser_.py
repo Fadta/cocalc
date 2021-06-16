@@ -1,3 +1,4 @@
+import sympy
 from tokens import Values, TokenType
 from calc_excepts import CocalcException
 from nodes import *
@@ -38,7 +39,7 @@ class Parser:
 
     def expr(self):
         """
-        returns an expression tree
+        returns an expression tree, separates by addition and substraction
         """
         result = self.term()
 
@@ -62,21 +63,32 @@ class Parser:
 
     def term(self):
         """
-        returns a term
+        returns a term, separates by multiplication and division
         """
-        result = self.factor()
+        result = self.exp_analysis()
 
         #while current_token exists and is multiplication and division
         while self.current_token != None and (self.current_token.type == TokenType.ARITH_OPERATION) and (self.current_token.value in (Values.AR_MUL, Values.AR_DIV)):
             # explore the factors inside
             if self.current_token.value == Values.AR_MUL:
                 self.advance()
-                result = ArithmeticNode('*', result, self.factor())
+                result = ArithmeticNode('*', result, self.exp_analysis())
             else:
                 self.advance()
-                result = ArithmeticNode('/', result, self.factor())
+                result = ArithmeticNode('/', result, self.exp_analysis())
 
         return result
+
+    def exp_analysis(self):
+        result = self.factor()
+
+        #while current_token exists and is exponentiation
+        while self.current_token != None and (self.current_token.type is TokenType.ARITH_OPERATION) and (self.current_token.value is Values.AR_EXP):
+            self.advance()
+            result = ArithmeticNode('^', result, self.factor())
+
+        return result
+
 
     def factor(self):
         """
@@ -100,6 +112,11 @@ class Parser:
         elif (token.type == TokenType.INT) or (token.type == TokenType.FLOAT):
             self.advance()
             return DataNode(token.value)
+
+        #if token is symbol
+        elif (token.type is TokenType.SYMBOL):
+            self.advance()
+            return DataNode(sympy.Symbol(token.value))
 
         #if token is varName
         elif (token.type == TokenType.VAR):
