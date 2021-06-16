@@ -96,3 +96,11 @@ class UnaryNode:
 
     def __repr__(self):
         return f"({self.type}{self.child})"
+
+@dataclass
+class AssignmentNode:
+    name: VarNode
+    expr: any
+
+    def __repr__(self):
+        return f"{self.name} = {self.value}"

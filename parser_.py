@@ -32,15 +32,21 @@ class Parser:
         result = self.expr()
 
         if self.current_token != None:
-            raise CocalcException("Parser: Excess tokens, parser commited sudoku")
+            raise CocalcException("Parser: Excess tokens, parser commited sudoku: ", self.current_token)
 
         return result
 
     def expr(self):
         """
-        returns an expression
+        returns an expression tree
         """
         result = self.term()
+
+        #check if expression is an assignment
+        if (self.current_token != None) and (self.current_token.type == TokenType.ASSIGNMENT):
+            self.advance()
+            result = AssignmentNode(result, self.expr())
+            return result
 
         #while current_token exists and is addition and substraction 
         while self.current_token != None and (self.current_token.type == TokenType.ARITH_OPERATION) and (self.current_token.value in (Values.AR_ADD, Values.AR_SUB)):
@@ -94,6 +100,11 @@ class Parser:
         elif (token.type == TokenType.INT) or (token.type == TokenType.FLOAT):
             self.advance()
             return DataNode(token.value)
+
+        #if token is varName
+        elif (token.type == TokenType.VAR):
+            self.advance()
+            return VarNode(token.value)
 
         #if token is a unary (e.g.: the signs in -3 or +5)
         elif (token.type == TokenType.ARITH_OPERATION) and (token.value == Values.AR_SUB):

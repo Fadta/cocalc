@@ -3,6 +3,7 @@ from lexer import Lexer
 from interpreter import Interpreter
 from calc_excepts import CocalcException
 
+interpreter = Interpreter()
 while True:
     try:
         #### Read ####
@@ -15,7 +16,6 @@ while True:
         parser = Parser(tokens)
         tree = parser.parse()
         # print(tree)
-        interpreter = Interpreter()
         value = interpreter.check(tree)
 
         #### Print ####
