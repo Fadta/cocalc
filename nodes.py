@@ -75,6 +75,13 @@ class SumNode:
         return f"(+{self.node})"
 
 @dataclass
+class VarNode:
+    name: any
+
+    def __repr(self):
+        return f"{self.name}"
+
+@dataclass
 class CallNode:
     function_pointer: any
     args: list
