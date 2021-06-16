@@ -1,6 +1,6 @@
 from enum import Enum
 from tokens import TokenType, Token, Values
-from calc_excepts import CocalcException
+from calc_excepts import LexerException
 
 BLANK = ' \n\t,'
 DIGITS = '0123456789'
@@ -103,7 +103,7 @@ class Lexer:
             self.advance()
 
         if self.current_char == None:
-            raise CocalcException("Lexer: Couldn't find string finisher")
+            raise LexerException("Lexer: Couldn't find string finisher")
         self.advance()
 
         return Token(TokenType.STRING, full_str)
@@ -111,7 +111,7 @@ class Lexer:
     def generate_tokens(self):
         """
         Creates a generator that yields Tokens
-        raises CocalcException if a character can't
+        raises LexerException if a character can't
         be processed
         """
         while self.current_char != None:
@@ -163,7 +163,8 @@ class Lexer:
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_EXP)
 
+            #lexer didn't understand what the user tried to say
             else:
-                raise CocalcException(f"IllegalCharacter: {self.current_char}")
+                raise LexerException(f"Lexer: explain this -> {self.current_char}")
 
 

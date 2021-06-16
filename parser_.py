@@ -1,6 +1,6 @@
 import sympy
 from tokens import Values, TokenType
-from calc_excepts import CocalcException
+from calc_excepts import ParserException
 from nodes import *
 
 class Parser:
@@ -33,7 +33,7 @@ class Parser:
         result = self.expr()
 
         if self.current_token != None:
-            raise CocalcException("Parser: Excess tokens, parser commited sudoku: ", self.current_token)
+            raise ParserException("Parser: Excess tokens, parser commited sudoku: ", self.current_token)
 
         return result
 
@@ -105,12 +105,12 @@ class Parser:
         if token.type is TokenType.PAREN and token.value is Values.PAREN_OPEN:
             self.advance()
             #Case: input empty parenthesis: cocalc > (
-            if self.current_token is None: raise CocalcException("Parser: Non closing parenthesis")
+            if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
             result = self.expr()
 
             #if parenthesis is not closed, user forgot to close it, raise exception
             if self.current_token is None or self.current_token.type != TokenType.PAREN or self.current_token.value != Values.PAREN_CLOSE:
-                raise CocalcException("Parser: You didn't close the parenthesis")
+                raise ParserException("Parser: You didn't close the parenthesis")
             self.advance()
             return result
 
@@ -120,11 +120,11 @@ class Parser:
             args = []
             self.advance()
             #Case: input non closing parenthesis: cocalc > function(
-            if self.current_token is None: raise CocalcException("Parser: Non closing parenthesis")
+            if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
             while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
                 #security check
                 if self.current_token == None:
-                    raise CocalcException("Parser: Didn't close call parenthesis")
+                    raise ParserException("Parser: Didn't close call parenthesis")
                 args.append(self.factor())
 
             #pass the closing parenthesis
@@ -159,5 +159,5 @@ class Parser:
             return UnaryNode('+', self.factor())
 
         #if nothing was returned, then parser is not prepared to deal with the user intellect
-        raise CocalcException("Parser: You commited an ucky wucky uwu. Check your syntax king")
+        raise ParserException("Parser: You commited an ucky wucky uwu. Check your syntax king")
 

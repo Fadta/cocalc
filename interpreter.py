@@ -1,4 +1,4 @@
-from calc_excepts import CocalcException
+from calc_excepts import InterpreterException, EnvironmentException
 from nodes import *
 from math_func import *
 
@@ -15,7 +15,10 @@ class Environment:
         self.variables[identifier] = value
 
     def get(self, identifier):
-        return self.variables[identifier]
+        try:
+            return self.variables[identifier]
+        except KeyError:
+            raise EnvironmentException(f"Environment: variable ({identifier}) does not exist")
 
     def call(self, func_name, parameters):
         if func_name in self.builtin_functions:
@@ -23,7 +26,7 @@ class Environment:
         elif func_name in self.user_functions:
             return 99
         else:
-            raise CocalcException("Environment: Unknown function")
+            raise EnvironmentException("Environment: Unknown function")
 
     def create_func(self, func_name, args, expr_tree):
         pass
@@ -68,5 +71,5 @@ class Interpreter:
             return self.env.get(node.name)
 
         else:
-            raise CocalcException(f'Interpreter: WTF is this? {type_}')
+            raise InterpreterException(f'Interpreter: WTF is this? {type_}')
 
