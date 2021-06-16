@@ -12,44 +12,11 @@ class DataNode:
         return f"{self.value}"
 
 @dataclass
-class AddNode:
-    node_a: any
-    node_b: any
+class StringNode:
+    value: str
 
     def __repr__(self):
-        return f"({self.node_a} + {self.node_b})"
-
-@dataclass
-class SubNode:
-    node_a: any
-    node_b: any
-
-    def __repr__(self):
-        return f"({self.node_a} - {self.node_b})"
-
-@dataclass
-class MulNode:
-    node_a: any
-    node_b: any
-
-    def __repr__(self):
-        return f"({self.node_a} * {self.node_b})"
-
-@dataclass
-class DivNode:
-    node_a: any
-    node_b: any
-
-    def __repr__(self):
-        return f"({self.node_a} / {self.node_b})"
-
-@dataclass
-class ExpNode:
-    node_a: any
-    node_b: any
-
-    def __repr__(self):
-        return f"({self.node_a} ^ {self.node_b})"
+        return value
 
 @dataclass
 class ArithmeticNode:
@@ -59,20 +26,6 @@ class ArithmeticNode:
 
     def __repr__(self):
         return f"({self.node_a} {self.operation} {self.node_b})"
-
-@dataclass
-class NegNode:
-    node: any
-
-    def __repr__(self):
-        return f"(-{self.node})"
-
-@dataclass
-class SumNode:
-    node:any
-
-    def __repr__(self):
-        return f"(+{self.node})"
 
 @dataclass
 class VarNode:
@@ -87,7 +40,7 @@ class CallNode:
     args: any
 
     def __repr__(self):
-        return f"{self.function_pointer}{self.args}"
+        return f"{self.name}{self.args}"
 
 @dataclass
 class UnaryNode:
@@ -98,9 +51,25 @@ class UnaryNode:
         return f"({self.type}{self.child})"
 
 @dataclass
+class FuncAssignNode:
+    func_expr: CallNode
+    expr_tree: any
+
+    def __repr__(self):
+        return f"({self.func_expr}: {self.expr_tree})"
+
+@dataclass
+class FuncParameter:
+    identifier: str
+    value: any
+
+    def __repr__(self):
+        return f"[{self.identifier}:{self.value}]"
+
+@dataclass
 class AssignmentNode:
     name: VarNode
     expr: any
 
     def __repr__(self):
-        return f"{self.name} = {self.value}"
+        return f"{self.name} = {self.expr}"
