@@ -46,7 +46,11 @@ class Parser:
         #check if expression is an assignment
         if (self.current_token != None) and (self.current_token.type == TokenType.ASSIGNMENT):
             self.advance()
-            result = AssignmentNode(result, self.expr())
+            if result is CallNode:
+                result = FuncAssignNode(result, self.expr())
+            else:
+                result = AssignmentNode(result, self.expr())
+            print(result)
             return result
 
         #while current_token exists and is addition and substraction 
@@ -97,31 +101,35 @@ class Parser:
         """
         token = self.current_token
 
+        #if token opens parenthesis
+        if token.type is TokenType.PAREN and token.value is Values.PAREN_OPEN:
+            self.advance()
+            #Case: input empty parenthesis: cocalc > (
+            if self.current_token is None: raise CocalcException("Parser: Non closing parenthesis")
+            result = self.expr()
+
+            #if parenthesis is not closed, user forgot to close it, raise exception
+            if self.current_token is None or self.current_token.type != TokenType.PAREN or self.current_token.value != Values.PAREN_CLOSE:
+                raise CocalcException("Parser: You didn't close the parenthesis")
+            self.advance()
+            return result
+
         #if token is call
-        if token.type is TokenType.CALL:
+        elif token.type is TokenType.CALL:
             name = token.value
             args = []
             self.advance()
+            #Case: input non closing parenthesis: cocalc > function(
+            if self.current_token is None: raise CocalcException("Parser: Non closing parenthesis")
             while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
                 #security check
                 if self.current_token == None:
                     raise CocalcException("Parser: Didn't close call parenthesis")
                 args.append(self.factor())
 
-            #pass the parenthesis
+            #pass the closing parenthesis
             self.advance()
             return CallNode(name, args)
-
-        #if token opens parenthesis
-        elif token.type is TokenType.PAREN and token.value is Values.PAREN_OPEN:
-            self.advance()
-            result = self.expr()
-
-            #if parenthesis is not closed, user forgot to close it, raise exception
-            if self.current_token.type != TokenType.PAREN or self.current_token.value != Values.PAREN_CLOSE:
-                raise CocalcException("Parser: You didn't close the parenthesis")
-            self.advance()
-            return result
 
         #if token is number
         elif token.type in (TokenType.INT, TokenType.FLOAT):
@@ -132,6 +140,10 @@ class Parser:
         elif (token.type is TokenType.SYMBOL):
             self.advance()
             return DataNode(sympy.Symbol(token.value))
+
+        elif token.type is TokenType.STRING:
+            self.advance()
+            return StringNode(token.value)
 
         #if token is varName
         elif (token.type == TokenType.VAR):
