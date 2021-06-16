@@ -3,7 +3,8 @@ from nodes import *
 from math_func import *
 
 class Environment:
-    def __init__(self):
+    def __init__(self, interpreter):
+        self.interpreter = interpreter
         self.variables = {}
         self.builtin_functions = {'sqrt': sqrt,
                                   'test': test_func,}
@@ -24,9 +25,13 @@ class Environment:
         else:
             raise CocalcException("Environment: Unknown function")
 
+    def create_func(self, func_name, args, expr_tree):
+        pass
+
+
 class Interpreter:
     def __init__(self):
-        self.env = Environment()
+        self.env = Environment(self)
 
     def check(self, node):
         type_ = type(node)
@@ -41,7 +46,7 @@ class Interpreter:
             return func(self.check(node.child))
 
         #retrieve basic data
-        elif type_ is DataNode:
+        elif type_ in (DataNode, StringNode):
             return node.value
 
         #call functions
@@ -50,6 +55,9 @@ class Interpreter:
             return self.env.call(node.name, args)
 
         #map values
+        elif type_ is FuncAssignNode:
+            print(node)
+            return 0
         elif type_ is AssignmentNode:
             #node.name is a VarNode which has a hashable field 'name', names need to be varied
             self.env.put(node.name.name, self.check(node.expr))

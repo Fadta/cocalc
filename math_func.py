@@ -15,5 +15,5 @@ def test_func(*args):
     string = ''
     for arg in args:
         string += str(arg)
-    return float(string)
+    return int(string)
 
