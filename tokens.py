@@ -11,9 +11,6 @@ class Values(Enum):
     # Parenthesis
     PAREN_OPEN = auto()
     PAREN_CLOSE = auto()
-    # Quotations
-    QUOTE_OPEN = auto()
-    QUOTE_CLOSE = auto()
 
 class TokenType(Enum):
     INT = auto()
@@ -25,7 +22,6 @@ class TokenType(Enum):
     VAR = auto()
     ASSIGNMENT = auto()
     PAREN = auto()
-    QUOTE = auto()
     ARITH_OPERATION = auto()
 
 @dataclass #dataclass decorator makes a struct-like DS
