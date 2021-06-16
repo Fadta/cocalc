@@ -1,5 +1,6 @@
 from parser_ import Parser
 from lexer import Lexer
+from interpreter import Interpreter
 from calc_excepts import CocalcException
 
 while True:
@@ -8,13 +9,17 @@ while True:
         text = input('cocalc > ')
         lexer = Lexer(text)
         tokens = lexer.generate_tokens()
+        # print(list(tokens))
 
         #### Interpret ####
         parser = Parser(tokens)
         tree = parser.parse()
+        # print(tree)
+        interpreter = Interpreter()
+        value = interpreter.check(tree)
 
         #### Print ####
-        print(tree, end='\n\n')
+        print('\t= ', value)
     except CocalcException as e:
         print(e)
 
