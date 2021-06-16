@@ -9,3 +9,11 @@ ARITHMETIC={'+': add, '-': sub, '*': mul, '/': div, '^': pow}
 def neg(n): return -n
 def nop(n): return n
 UNARY = {'-': neg, '+': nop}
+
+def sqrt(n): return math.sqrt(n)
+def test_func(*args):
+    string = ''
+    for arg in args:
+        string += str(arg)
+    return float(string)
+

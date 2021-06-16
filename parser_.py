@@ -97,8 +97,23 @@ class Parser:
         """
         token = self.current_token
 
+        #if token is call
+        if token.type is TokenType.CALL:
+            name = token.value
+            args = []
+            self.advance()
+            while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
+                #security check
+                if self.current_token == None:
+                    raise CocalcException("Parser: Didn't close call parenthesis")
+                args.append(self.factor())
+
+            #pass the parenthesis
+            self.advance()
+            return CallNode(name, args)
+
         #if token opens parenthesis
-        if token.type == TokenType.PAREN and token.value == Values.PAREN_OPEN:
+        elif token.type is TokenType.PAREN and token.value is Values.PAREN_OPEN:
             self.advance()
             result = self.expr()
 
@@ -109,7 +124,7 @@ class Parser:
             return result
 
         #if token is number
-        elif (token.type == TokenType.INT) or (token.type == TokenType.FLOAT):
+        elif token.type in (TokenType.INT, TokenType.FLOAT):
             self.advance()
             return DataNode(token.value)
 

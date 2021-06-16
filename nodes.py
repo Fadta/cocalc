@@ -83,8 +83,8 @@ class VarNode:
 
 @dataclass
 class CallNode:
-    function_pointer: any
-    args: list
+    name: str
+    args: any
 
     def __repr__(self):
         return f"{self.function_pointer}{self.args}"
