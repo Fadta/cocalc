@@ -1,13 +1,16 @@
+from prettifier.colorifier import colorify, TextColor
 from parser_ import Parser
 from lexer import Lexer
 from interpreter import Interpreter
 from calc_excepts import CocalcException
 
+prompt=colorify('cocalc > ', TextColor.OKCYAN)
+
 interpreter = Interpreter()
 while True:
     try:
         #### Read ####
-        text = input('cocalc > ')
+        text = input(prompt)
         lexer = Lexer(text)
         tokens = lexer.generate_tokens()
         # print(list(tokens))
@@ -19,9 +22,9 @@ while True:
         value = interpreter.check(tree)
 
         #### Print ####
-        print('\t= ', value)
+        print(colorify(f"\t= {value}", TextColor.OKGREEN))
     except CocalcException as e:
-        print(e)
+        print(colorify(e, TextColor.FAIL))
 
     except KeyboardInterrupt:
         print('Goodbye OwO')
