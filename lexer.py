@@ -6,6 +6,7 @@ BLANK = ' \n\t,'
 DIGITS = '0123456789'
 CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 STRING_CHAR = '"'
+ALGEBRAIC_SYMBOLS = 'xyz'
 
 class Lexer:
     """
@@ -71,7 +72,7 @@ class Lexer:
             char_count += 1
             self.advance()
 
-        if char_count == 1:
+        if char_count == 1 and name in ALGEBRAIC_SYMBOLS:
             return Token(TokenType.SYMBOL, name) #if 'x' then it is algebraic symbol x
         elif isCall:
             return Token(TokenType.CALL, name) #if 'floor(' then it is call for function floor
