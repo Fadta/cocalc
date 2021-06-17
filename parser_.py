@@ -30,12 +30,31 @@ class Parser:
         if self.current_token == None:
             return None
 
-        result = self.expr()
+        result = self.assign_analysis()
 
         if self.current_token != None:
             raise ParserException("Parser: Excess tokens, parser commited sudoku: ", self.current_token)
 
         return result
+
+    def assign_analysis(self):
+        result = self.expr()
+        res_type = type(result)
+        assign_type = -1
+
+        if res_type is VarNode: assign_type = 0
+        elif res_type is CallNode: assign_type = 1
+
+        if (self.current_token != None) and (self.current_token.type == TokenType.ASSIGNMENT):
+            self.advance()
+            if assign_type == 1:
+                result = FuncAssignNode(result, self.expr())
+                result.link_variables()
+            elif assign_type == 0:
+                result = AssignmentNode(result, self.expr())
+
+        return result
+
 
     def expr(self):
         """
@@ -44,15 +63,6 @@ class Parser:
         result = self.term()
 
         #check if expression is an assignment
-        if (self.current_token != None) and (self.current_token.type == TokenType.ASSIGNMENT):
-            self.advance()
-            if result is CallNode:
-                result = FuncAssignNode(result, self.expr())
-            else:
-                result = AssignmentNode(result, self.expr())
-            print(result)
-            return result
-
         #while current_token exists and is addition and substraction 
         while self.current_token != None and (self.current_token.type == TokenType.ARITH_OPERATION) and (self.current_token.value in (Values.AR_ADD, Values.AR_SUB)):
             # explore the terms inside
@@ -93,6 +103,24 @@ class Parser:
 
         return result
 
+    def extract_func_args(self):
+        args = []
+        arg_count = 0
+        self.advance()
+        #Case: input non closing parenthesis: cocalc > function(
+        if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
+        while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
+            #security check
+            if self.current_token == None:
+                raise ParserException("Parser: Didn't close call parenthesis")
+
+            args.append(FuncParameter(str(arg_count), self.expr()))
+            arg_count += 1
+
+        #pass the closing parenthesis
+        self.advance()
+        return args
+
 
     def factor(self):
         """
@@ -117,18 +145,18 @@ class Parser:
         #if token is call
         elif token.type is TokenType.CALL:
             name = token.value
-            args = []
-            self.advance()
+            args = self.extract_func_args()
+            #self.advance()
             #Case: input non closing parenthesis: cocalc > function(
-            if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
-            while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
+            #if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
+            #while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
                 #security check
-                if self.current_token == None:
-                    raise ParserException("Parser: Didn't close call parenthesis")
-                args.append(self.factor())
+            #    if self.current_token == None:
+            #        raise ParserException("Parser: Didn't close call parenthesis")
+            #    args.append(self.factor())
 
             #pass the closing parenthesis
-            self.advance()
+            #self.advance()
             return CallNode(name, args)
 
         #if token is number
@@ -148,7 +176,7 @@ class Parser:
         #if token is varName
         elif (token.type == TokenType.VAR):
             self.advance()
-            return VarNode(token.value)
+            return VarNode(token.value, 0)
 
         #if token is a unary (e.g.: the signs in -3 or +5)
         elif (token.type == TokenType.ARITH_OPERATION) and (token.value == Values.AR_SUB):
@@ -159,5 +187,5 @@ class Parser:
             return UnaryNode('+', self.factor())
 
         #if nothing was returned, then parser is not prepared to deal with the user intellect
-        raise ParserException("Parser: You commited an ucky wucky uwu. Check your syntax king")
+        raise ParserException(f"Parser({token}): You commited an ucky wucky uwu. Check your syntax king")
 
