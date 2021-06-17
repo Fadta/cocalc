@@ -1,6 +1,7 @@
 from enum import Enum
 from tokens import TokenType, Token, Values
 from calc_excepts import LexerException
+from interpreter import Environment
 
 BLANK = ' \n\t,'
 DIGITS = '0123456789'

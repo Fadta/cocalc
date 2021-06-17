@@ -2,11 +2,12 @@ from calc_excepts import InterpreterException, EnvironmentException
 from nodes import *
 from math_func import *
 import sympy
+import math
 
 class Environment:
-    def __init__(self, interpreter):
+    def __init__(self, interpreter = None):
         self.interpreter = interpreter
-        self.variables = {}
+        self.variables = {'ans': 0, 'e': math.e, 'pi': math.pi}
         self.builtin_functions = {'sqrt': sqrt,
                                   'test': test_func,
                                   'expand': sympy.expand,
