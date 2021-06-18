@@ -76,7 +76,10 @@ class FuncAssignNode:
 
     def walk_and_replace(self, node, search_for, real_name):
         node_type = type(node)
-        if node_type is ArithmeticNode:
+        if node_type is CallNode:
+            for arg in node.args:
+                self.walk_and_replace(arg.value, search_for, real_name)
+        elif node_type is ArithmeticNode:
             self.walk_and_replace(node.node_a, search_for, real_name)
             self.walk_and_replace(node.node_b, search_for, real_name)
         elif node_type is UnaryNode:
