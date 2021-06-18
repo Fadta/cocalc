@@ -35,7 +35,10 @@ class Environment:
 
     def call(self, func_name, parameters):
         if func_name in self.builtin_functions:
-            return self.builtin_functions[func_name](*parameters)
+            try:
+                return self.builtin_functions[func_name](*parameters)
+            except Exception as e:
+                raise EnvironmentException(f'Environment: function {func_name}{tuple(parameters)} raised:\n\t {e}')
 
         elif func_name in self.user_functions:
             param_size = self.user_functions[func_name][0]
