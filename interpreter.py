@@ -19,6 +19,9 @@ class Environment:
         self.user_functions = {}
         self.func_parameters = []
 
+    def assign_interpreter(self, interpreter):
+        self.interpreter = interpreter
+
     def put(self, identifier, value):
         self.variables[identifier] = value
 
@@ -64,8 +67,9 @@ class Environment:
 
 
 class Interpreter:
-    def __init__(self):
-        self.env = Environment(self)
+    def __init__(self, env: Environment):
+        self.env = env
+        self.env.assign_interpreter(self)
 
     def check(self, node):
         type_ = type(node)
