@@ -2,6 +2,10 @@ import sympy
 from tokens import Values, TokenType
 from calc_excepts import ParserException
 from nodes import *
+from interpreter import Environment
+
+#requires py >= 3.5
+RESERVED_NAMES = [*Environment().builtin_functions] + [*Environment().variables]
 
 class Parser:
     """
@@ -46,6 +50,8 @@ class Parser:
         elif res_type is CallNode: assign_type = 1
 
         if (self.current_token != None) and (self.current_token.type == TokenType.ASSIGNMENT):
+            if result.name in RESERVED_NAMES:
+                raise ParserException(f'Parser: name "{result.name}" is reserved')
             self.advance()
             if assign_type == 1:
                 result = FuncAssignNode(result, self.expr())
@@ -108,14 +114,14 @@ class Parser:
         arg_count = 0
         self.advance()
         #Case: input non closing parenthesis: cocalc > function(
-        if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
-        while self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
+        while self.current_token is not None and self.current_token.type != TokenType.PAREN and self.current_token.value != Values.PAREN_CLOSE:
             #security check
             if self.current_token == None:
                 raise ParserException("Parser: Didn't close call parenthesis")
 
             args.append(FuncParameter(str(arg_count), self.expr()))
             arg_count += 1
+        if self.current_token is None: raise ParserException("Parser: Non closing parenthesis")
 
         #pass the closing parenthesis
         self.advance()
