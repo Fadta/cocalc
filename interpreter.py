@@ -1,17 +1,21 @@
 from calc_excepts import InterpreterException, EnvironmentException
 from nodes import *
-from math_func import *
+import math_func as mf
 import sympy
 import math
 
 class Environment:
     def __init__(self, interpreter = None):
         self.interpreter = interpreter
-        self.variables = {'ans': 0, 'e': math.e, 'pi': math.pi}
-        self.builtin_functions = {'sqrt': sqrt,
-                                  'test': test_func,
+        self.variables = {'ans': 0, 'e': math.e, 'pi': math.pi, 'inf': sympy.oo}
+        self.builtin_functions = {'sqrt': sympy.sqrt,
+                                  'test': mf.test_func,
                                   'expand': sympy.expand,
-                                  'factor': sympy.factor,}
+                                  'factor': sympy.factor,
+                                  'lim': mf.lim,
+                                  'diff': sympy.diff,
+                                  'int': sympy.integrate,
+                                  'latex': sympy.latex,}
         self.user_functions = {}
         self.func_parameters = []
 
@@ -67,7 +71,7 @@ class Interpreter:
         type_ = type(node)
         # Binary operations
         if type_ is ArithmeticNode:
-            func = ARITHMETIC[node.operation]
+            func = mf.ARITHMETIC[node.operation]
             return func(self.check(node.node_a), self.check(node.node_b))
 
         #Unary operations

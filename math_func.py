@@ -1,5 +1,6 @@
 from calc_excepts import MathError
 import math
+import sympy
 
 def add(n1, n2): return n1 + n2
 def sub(n1, n2): return n1 - n2
@@ -19,4 +20,6 @@ def test_func(*args):
     for arg in args:
         string += str(arg)
     return int(string)
+
+def lim(symbol, z0, expr): return sympy.limit(expr, symbol, z0)
 
