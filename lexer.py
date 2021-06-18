@@ -64,7 +64,7 @@ class Lexer:
         isCall = False
         self.advance()
 
-        while self.current_char != None and ((self.current_char in CHARS) or ( self.current_char == '(')):
+        while self.current_char != None and ((self.current_char in CHARS+DIGITS) or ( self.current_char == '(')):
             if self.current_char == '(':
                 isCall = True
                 self.advance()
