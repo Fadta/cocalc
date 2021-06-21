@@ -30,6 +30,10 @@ class Parser:
     def parse(self):
         """
         Starts the parsing, returns an execution tree
+
+        if there are excess tokens
+        (i.e.: current_token != None at the end of analysis)
+        raises ParserException
         """
         if self.current_token == None:
             return None
@@ -110,6 +114,9 @@ class Parser:
         return result
 
     def extract_func_args(self):
+        """
+        Builds the argument part of a function call
+        """
         args = []
         arg_count = 0
         self.advance()

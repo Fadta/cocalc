@@ -5,27 +5,57 @@ import sympy
 import math
 
 class Environment:
+    """
+    The Environment is a group of static variables,
+    where the interpreter can put and retrieve values
+    """
     def __init__(self, interpreter = None):
+        """
+        A interpreter may retrieve values of the Environment
+        but it needs to associate itself with it first
+        """
         self.interpreter = interpreter
-        self.variables = {'ans': 0, 'e': math.e, 'pi': math.pi, 'inf': sympy.oo}
+        self.variables = {'ans': 0, 'e': math.e, 'pi': sympy.pi, 'inf': sympy.oo}
         self.builtin_functions = {'sqrt': sympy.sqrt,
+                                  'log': sympy.log,
+                                  'cos': sympy.cos,
+                                  'sin': sympy.sin,
+                                  'tan': sympy.tan,
                                   'test': mf.test_func,
                                   'expand': sympy.expand,
                                   'factor': sympy.factor,
                                   'lim': mf.lim,
                                   'diff': sympy.diff,
                                   'int': sympy.integrate,
-                                  'latex': sympy.latex,}
+                                  'latex': sympy.latex,
+                                  }
         self.user_functions = {}
         self.func_parameters = []
 
     def assign_interpreter(self, interpreter):
+        """
+        Change current associated interpreter
+        """
         self.interpreter = interpreter
 
     def put(self, identifier, value):
+        """
+        Store a variable identifier with its value
+        inside the environment
+        """
         self.variables[identifier] = value
 
     def get(self, identifier, scope):
+        """
+        Retrieve a stored variable identifier
+        of the corresponding scope:
+            0- global
+            1- function argument
+
+        raises EnvironmentException if:
+            -scope is not defined (see up)
+            -identifier does not exist
+        """
         try:
             if scope == 0:
                 return self.variables[identifier]
@@ -37,10 +67,36 @@ class Environment:
             raise EnvironmentException(f"Environment: variable ({identifier}) does not exist")
 
     def load_parameters(self, params: list):
+        """
+        put the function parameters in a
+        'stack-like' data structure so the
+        function call may use them
+        """
         for param in params:
             self.func_parameters.append(param)
 
     def call(self, func_name, parameters):
+        """
+        search func_name in builtin_functions:
+            if it exists then uncompress the
+            raw data of parameters
+
+            Exceptions of builtin_functions are
+            treated and printed so program doesn't crash
+
+        elif search func_name in user_functions:
+            if it exists then retrieve the expr_tree
+                load_parameters
+
+                walk with the associated interpreter
+                the expr_tree
+
+        raises EnvironmentException if:
+            there are more or less parameters than required
+            or
+            func_name is not in builtin_functions nor user_functions
+
+        """
         if func_name in self.builtin_functions:
             try:
                 return self.builtin_functions[func_name](*parameters)
@@ -61,17 +117,29 @@ class Environment:
             raise EnvironmentException("Environment: Unknown function")
 
     def create_func(self, func_name, args, expr_tree):
+        """
+        store an expression tree associated with the func_name
+        args contain a tuple (funcVarId, expr_treeVarName)
+        """
         arg_len = len(args)
         val = (arg_len, expr_tree)
         self.user_functions[func_name] = val
 
 
 class Interpreter:
+    """
+    The interpreter walks the execution tree
+    and executes each node
+    """
     def __init__(self, env: Environment):
         self.env = env
         self.env.assign_interpreter(self)
 
     def check(self, node):
+        """
+        start to walk starting from this node
+        evaluate node (by type) and then check() childs
+        """
         type_ = type(node)
         # Binary operations
         if type_ is ArithmeticNode:
