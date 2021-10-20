@@ -21,6 +21,15 @@ class Environment:
                                   'cos': sympy.cos,
                                   'sin': sympy.sin,
                                   'tan': sympy.tan,
+                                  'sec': sympy.sec,
+                                  'csc': sympy.csc,
+                                  'cot': sympy.cot,
+                                  'acos': sympy.acos,
+                                  'asin': sympy.asin,
+                                  'atan': sympy.atan,
+                                  'asec': sympy.asec,
+                                  'acsc': sympy.acsc,
+                                  'acot': sympy.acot,
                                   'test': mf.test_func,
                                   'expand': sympy.expand,
                                   'factor': sympy.factor,
@@ -148,7 +157,7 @@ class Interpreter:
 
         #Unary operations
         elif type_ is UnaryNode:
-            func = UNARY[node.type]
+            func = mf.UNARY[node.type]
             return func(self.check(node.child))
 
         #retrieve basic data
