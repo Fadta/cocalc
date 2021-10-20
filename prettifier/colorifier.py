@@ -1,6 +1,13 @@
 from enum import Enum
 
 class TextColor(Enum):
+    """
+    ANSI scape sequences for colors,
+    when using a constant call the value
+    (TextColor.const.value)
+
+    call TextColor.ENDC so escape sequence is terminated
+    """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKCYAN = '\033[96m'
