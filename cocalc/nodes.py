@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-import tokens
+import cocalc.tokens as tokens
+
 
 @dataclass
 class DataNode:
@@ -11,12 +12,14 @@ class DataNode:
     def __repr__(self):
         return f"{self.value}"
 
+
 @dataclass
 class StringNode:
     value: str
 
     def __repr__(self):
         return value
+
 
 @dataclass
 class ArithmeticNode:
@@ -26,6 +29,7 @@ class ArithmeticNode:
 
     def __repr__(self):
         return f"({self.node_a} {self.operation} {self.node_b})"
+
 
 @dataclass
 class VarNode:
@@ -41,6 +45,7 @@ class VarNode:
     def __repr(self):
         return f"{self.name}[{self.scope}]"
 
+
 @dataclass
 class FuncParameter:
     identifier: str
@@ -48,6 +53,7 @@ class FuncParameter:
 
     def __repr__(self):
         return f"({self.identifier}:{self.value})"
+
 
 @dataclass
 class CallNode:
@@ -57,6 +63,7 @@ class CallNode:
     def __repr__(self):
         return f"{self.name}{self.args}"
 
+
 @dataclass
 class UnaryNode:
     type: any
@@ -65,9 +72,11 @@ class UnaryNode:
     def __repr__(self):
         return f"({self.type}{self.child})"
 
+
 @dataclass
 class FuncVarNode:
     name: str
+
 
 @dataclass
 class FuncAssignNode:
@@ -93,7 +102,7 @@ class FuncAssignNode:
     def link_variables(self):
         name_dict = {}
         search_for = []
-        #param.value in func_expr should be a string containing the name of the nomenclated
+        # param.value in func_expr should be a string containing the name of the nomenclated
         for param in self.func_expr.args:
             search_for.append(param.value)
             name_dict[param.value.name] = param.identifier
@@ -102,6 +111,7 @@ class FuncAssignNode:
 
     def __repr__(self):
         return f"({self.func_expr}: {self.expr_tree})"
+
 
 @dataclass
 class AssignmentNode:

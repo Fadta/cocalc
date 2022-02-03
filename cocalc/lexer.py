@@ -1,7 +1,5 @@
-from enum import Enum
-from tokens import TokenType, Token, Values
-from calc_excepts import LexerException
-from interpreter import Environment
+from cocalc.tokens import TokenType, Token, Values
+from cocalc.calc_excepts import LexerException
 
 BLANK = ' \n\t,'
 DIGITS = '0123456789'
@@ -9,10 +7,12 @@ CHARS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_'
 STRING_CHAR = '"'
 ALGEBRAIC_SYMBOLS = 'xyz'
 
+
 class Lexer:
     """
     The lexer abstracts the characters into lexical units (Tokens)
     """
+
     def __init__(self, text):
         self.text = iter(text)
         self.advance()
@@ -36,11 +36,11 @@ class Lexer:
         decimal_points = 0
         num_str = ''
 
-        while (self.current_char != None) and ((self.current_char == '.') or (self.current_char in DIGITS)):
+        while (self.current_char is not None) and ((self.current_char == '.') or (self.current_char in DIGITS)):
             if self.current_char == '.':
                 decimal_points += 1
                 if decimal_points > 1:
-                    break;
+                    break
 
             num_str += self.current_char
             self.advance()
@@ -64,7 +64,7 @@ class Lexer:
         isCall = False
         self.advance()
 
-        while self.current_char != None and ((self.current_char in CHARS+DIGITS) or ( self.current_char == '(')):
+        while self.current_char is not None and ((self.current_char in CHARS+DIGITS) or (self.current_char == '(')):
             if self.current_char == '(':
                 isCall = True
                 self.advance()
@@ -74,11 +74,11 @@ class Lexer:
             self.advance()
 
         if char_count == 1 and name in ALGEBRAIC_SYMBOLS:
-            return Token(TokenType.SYMBOL, name) #if 'x' then it is algebraic symbol x
+            return Token(TokenType.SYMBOL, name)  # if 'x' then it is algebraic symbol x
         elif isCall:
-            return Token(TokenType.CALL, name) #if 'floor(' then it is call for function floor
+            return Token(TokenType.CALL, name)  # if 'floor(' then it is call for function floor
         else:
-            return Token(TokenType.VAR, name) #if 'gravity' then call for stored value: gravity
+            return Token(TokenType.VAR, name)  # if 'gravity' then call for stored value: gravity
 
     def generate_str(self):
         """
@@ -116,57 +116,55 @@ class Lexer:
         raises LexerException if a character can't
         be processed
         """
-        while self.current_char != None:
+        while self.current_char is not None:
             if self.current_char in BLANK:
                 self.advance()
-            #numbers
+            # numbers
             elif self.current_char in DIGITS or self.current_char == '.':
                 yield self.generate_number()
 
-            #characters
+            # characters
             elif self.current_char in CHARS:
                 yield self.generate_char_token()
 
-            #parenthesis open
+            # parenthesis open
             elif self.current_char == '(':
                 self.advance()
                 yield Token(TokenType.PAREN, Values.PAREN_OPEN)
-            #parenthesis close
+            # parenthesis close
             elif self.current_char == ')':
                 self.advance()
                 yield Token(TokenType.PAREN, Values.PAREN_CLOSE)
-            #assignment
+            # assignment
             elif self.current_char == '=':
                 self.advance()
                 yield Token(TokenType.ASSIGNMENT, None)
-            #string
+            # string
             elif self.current_char == STRING_CHAR:
                 yield self.generate_str()
 
             ###### ARITHMETIC SYMBOLS #####
-            #addition
+            # addition
             elif self.current_char == '+':
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_ADD)
-            #substraction
+            # substraction
             elif self.current_char == '-':
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_SUB)
-            #division
+            # division
             elif self.current_char == '/':
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_DIV)
-            #multiplication
+            # multiplication
             elif self.current_char == '*':
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_MUL)
-            #exponentiation
+            # exponentiation
             elif self.current_char == '^':
                 self.advance()
                 yield Token(TokenType.ARITH_OPERATION, Values.AR_EXP)
 
-            #lexer didn't understand what the user tried to say
+            # lexer didn't understand what the user tried to say
             else:
                 raise LexerException(f"Lexer: explain this -> {self.current_char}")
-
-

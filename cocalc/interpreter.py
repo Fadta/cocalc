@@ -1,15 +1,17 @@
-from calc_excepts import InterpreterException, EnvironmentException
-from nodes import *
-import math_func as mf
+from cocalc.calc_excepts import InterpreterException, EnvironmentException
+from cocalc.nodes import *
+import cocalc.math_func as mf
 import sympy
 import math
+
 
 class Environment:
     """
     The Environment is a group of static variables,
     where the interpreter can put and retrieve values
     """
-    def __init__(self, interpreter = None):
+
+    def __init__(self, interpreter=None):
         """
         A interpreter may retrieve values of the Environment
         but it needs to associate itself with it first
@@ -155,33 +157,32 @@ class Interpreter:
             func = mf.ARITHMETIC[node.operation]
             return func(self.check(node.node_a), self.check(node.node_b))
 
-        #Unary operations
+        # Unary operations
         elif type_ is UnaryNode:
             func = mf.UNARY[node.type]
             return func(self.check(node.child))
 
-        #retrieve basic data
+        # retrieve basic data
         elif type_ in (DataNode, StringNode):
             return node.value
 
-        #call functions
+        # call functions
         elif type_ is CallNode:
             args = [self.check(arg.value) for arg in node.args]
             return self.env.call(node.name, args)
 
-        #map values
+        # map values
         elif type_ is FuncAssignNode:
             self.env.create_func(node.func_expr.name, node.func_expr.args, node.expr_tree)
             return 1
         elif type_ is AssignmentNode:
-            #node.name is a VarNode which has a hashable field 'name', names need to be varied
+            # node.name is a VarNode which has a hashable field 'name', names need to be varied
             self.env.put(node.name.name, self.check(node.expr))
             return self.env.get(node.name.name, node.name.scope)
 
-        #retrieve mapped value
+        # retrieve mapped value
         elif type_ is VarNode:
             return self.env.get(node.name, node.scope)
 
         else:
             raise InterpreterException(f'Interpreter: WTF is this? {type_}')
-

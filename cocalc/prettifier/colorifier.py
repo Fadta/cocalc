@@ -1,5 +1,6 @@
 from enum import Enum
 
+
 class TextColor(Enum):
     """
     ANSI scape sequences for colors,
@@ -18,8 +19,10 @@ class TextColor(Enum):
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def colorify(text, color:TextColor):
+
+def colorify(text, color: TextColor):
     return f"{color.value}{text}{TextColor.ENDC.value}"
+
 
 if __name__ == "__main__":
     print(colorify("HEADER", TextColor.HEADER))
@@ -30,4 +33,3 @@ if __name__ == "__main__":
     print(colorify("FAIL", TextColor.FAIL))
     print(colorify("BOLD", TextColor.BOLD))
     print(colorify("UNDERLINE", TextColor.UNDERLINE))
-
