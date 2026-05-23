@@ -44,7 +44,7 @@ class Parser:
         result = self.assign_analysis()
 
         if self.current_token is not None:
-            raise ParserException("Parser: Excess tokens, parser commited sudoku: ", self.current_token)
+            raise ParserException("Parser received more tokens than expected: ", self.current_token)
 
         return result
 
@@ -207,4 +207,4 @@ class Parser:
             return UnaryNode('+', self.factor())
 
         # if nothing was returned, then parser is not prepared to deal with the user intellect
-        raise ParserException(f"Parser({token}): You commited an ucky wucky uwu. Check your syntax king")
+        raise ParserException(f"Parser({token}): Syntax Error")
