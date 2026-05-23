@@ -40,7 +40,7 @@ def main():
             print(colorify(e, TextColor.FAIL))
 
         except KeyboardInterrupt:
-            print('\nGoodbye OwO')
+            print('\nGoodbye!')
             exit()
 
 
